@@ -1,7 +1,11 @@
 #!/bin/bash
 
-cp arte.py arte.command
-SetFile -a E  arte.command
+cmdfile="Arte+7.command"
+
+cp arte.py $cmdfile
+
+# Hide extension
+SetFile -a E $cmdfile
 
 # Take an image and make the image its own icon:
 #sips -i icon.png
@@ -10,11 +14,14 @@ SetFile -a E  arte.command
 DeRez -only icns icon.png > tmpicns.rsrc
 
 # append this resource to the file you want to icon-ize.
-Rez -append tmpicns.rsrc -o arte.command
+Rez -append tmpicns.rsrc -o $cmdfile
 
 # Use the resource to set the icon.
-SetFile -a C arte.command
+SetFile -a C $cmdfile
 
 # clean up.
-rm tmpicns.rsrc
-# rm icon.png # probably want to keep this for re-use.
+rm -f tmpicns.rsrc
+
+mv $cmdfile /Applications
+
+
