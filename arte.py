@@ -10,6 +10,9 @@ from bs4 import BeautifulSoup
 import json
 import urllib2
 import sys
+import wget
+from os import environ
+
 
 def query_yes_no(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
@@ -45,34 +48,8 @@ def query_yes_no(question, default="yes"):
             sys.stdout.write("Please respond with 'yes' or 'no' "
                              "(or 'y' or 'n').\n")
 
-def download_url(url):
-    "Taken from http://stackoverflow.com/a/22776/5072688"
-    
-    file_name = url.split('/')[-1]
-    u = urllib2.urlopen(url)
-    f = open(file_name, 'wb')
-    meta = u.info()
-    file_size = int(meta.getheaders("Content-Length")[0])
-    print "Downloading: %s Bytes: %s" % (file_name, file_size)
-    
-    file_size_dl = 0
-    block_sz = 8192
-    while True:
-        buffer = u.read(block_sz)
-        if not buffer:
-            break
-    
-        file_size_dl += len(buffer)
-        f.write(buffer)
-        status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl*100./file_size)
-        status = status + chr(8)*(len(status)+1)
-        print status,
-    
-    f.close()
-
 if __name__ == '__main__':
 
-    #url = "http://www.arte.tv/guide/fr/041664-000/le-big-bang-mes-ancetres-et-moi?autoplay=1"
     Arte_url = raw_input('Enter an Arte+7 URL: ')              
     
     page = urllib2.urlopen(Arte_url)
@@ -99,7 +76,7 @@ if __name__ == '__main__':
                 iversion += 1
     
     try:
-        version = int(raw_input('Choise your version: '))
+        version = int(raw_input('Choose your version: '))
     except:
         raise ValueError('Version number must be an integer')
     
@@ -108,8 +85,11 @@ if __name__ == '__main__':
     else:
         url = urls[version]
     
-        download = query_yes_no('Do you want to download {} ?'.format(url))
-                    
+        download = query_yes_no('Do you want to download {} ?'.format(url))                   
         if download:
-            download_url(url)
+            # Destination directory is default user download directory
+            directory = environ['HOME']+"/Downloads"
+            wget_file_name = wget.download(url, out=directory)
+            file_name = url.split('/')[-1]
+            print "\nFile {} downloaded to {}".format(file_name, directory)
             
