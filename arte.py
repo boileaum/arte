@@ -85,7 +85,7 @@ if __name__ == '__main__':
     else:
         url = urls[version]
     
-        download = query_yes_no('Do you want to download {} ?'.format(url))                   
+        download = query_yes_no('Download {} ?'.format(url))                   
         if download:
             # Destination directory is default user download directory
             directory = environ['HOME']+"/Downloads"
