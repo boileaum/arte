@@ -8,7 +8,7 @@ cp arte.py $cmdfile
 SetFile -a E $cmdfile
 
 # Take an image and make the image its own icon:
-#sips -i icon.png
+sips -i icon.png
 
 # Extract the icon to its own resource file:
 DeRez -only icns icon.png > tmpicns.rsrc
