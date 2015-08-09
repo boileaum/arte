@@ -63,9 +63,9 @@ if __name__ == '__main__':
     f = urllib2.urlopen(jsonfile_url)
     data = json.load(f)  # Read JSON file
 
-    broadcast = data['videoJsonPlayer']['VTI']  # Get broadcast name
+    broadcast = data['videoJsonPlayer']['VTI'].encode('utf-8')  # Get broadcast name
     try:
-        title = data['videoJsonPlayer']['VSU']  # Get episode name
+        title = data['videoJsonPlayer']['VSU'].encode('utf-8')  # Get episode name
     except:
         title = ""    
     print "Available versions of \"{} - {}\"".format(broadcast, title)
@@ -94,7 +94,7 @@ if __name__ == '__main__':
         file_name = "Arte-{}-{}-{}.{}".format(broadcast, title,
                                         version_string.replace(" ","-"),
                                         file_extension)
-        # Remove ":" and replace spaces by underscores
+        # Remove ":" and replace spaces (and duplicate spaces) by underscores
         file_name_string = re.sub(' +','_',file_name.replace(":",""))
 
         # Destination directory is default user download directory
