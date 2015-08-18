@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jul 15 10:24:22 2015
-
-@author: boileau
+Download Arte video replay
 """
 
 from bs4 import BeautifulSoup
