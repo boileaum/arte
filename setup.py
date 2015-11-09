@@ -10,7 +10,7 @@ from setuptools import setup
 APP = ['Arte.py']
 DATA_FILES = []
 OPTIONS = {'argv_emulation': True,
- 'iconfile': '/Users/boileau/Documents/Git/Arte/icon.icns'}
+ 'iconfile': './icon.icns'}
 
 setup(
     app=APP,
