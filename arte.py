@@ -9,6 +9,7 @@ import easygui
 import json
 import re
 import subprocess
+import sys
 import urllib2
 import wget
 from os import environ
@@ -16,7 +17,9 @@ from os import environ
 
 if __name__ == '__main__':
 
-    Arte_url = easygui.enterbox('Enter an Arte+7 URL: ')              
+    Arte_url = easygui.enterbox('Enter an Arte+7 URL: ')
+    if not Arte_url:
+        sys.exit(0)         
     page = urllib2.urlopen(Arte_url)
     soup = BeautifulSoup(page.read(), "html.parser")
     

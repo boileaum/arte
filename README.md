@@ -1,7 +1,17 @@
-# Quick installation guide
+# Quick dev guide
 
-1. Unzip ``arte_plus_7.zip``
-2. In the terminal, go to the ``arte_plus_7`` directory
-3. type ``./create_command.sh``
-4. In the Finder, go to ``/Application`` and double click on ``Arte+7``
+
+# Create the icon file
+
+Go to the ``./icon`` dir and run the ``./convert_png_to_icns.sh`` script to convert the original ``icon.png`` file into a ``icon.icns`` icon file.
+
+# Build App automatically
+
+Run the shell script ``./install.sh`` that:
+
+1. Cleans the ``build`` and ``dist`` directories: ``clean.sh`` 
+2. builds the App using py2app: ``build_standalone.sh``
+3. Adds proper links and change App name: ``finalize.sh``
+	
+
 

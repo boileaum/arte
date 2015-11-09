@@ -9,8 +9,7 @@ from setuptools import setup
 
 APP = ['Arte.py']
 DATA_FILES = []
-OPTIONS = {'argv_emulation': True,
- 'iconfile': './icon.icns'}
+OPTIONS = {'iconfile': './icon/icon.icns'}
 
 setup(
     app=APP,
