@@ -11,6 +11,45 @@ import re
 import urllib2
 import wget
 from os import environ
+import Tkinter as tk
+import ttk
+
+class DownloadBar(tk.Tk):
+
+    def __init__(self, url, *args, **kwargs):
+        
+        tk.Tk.__init__(self, *args, **kwargs)
+        cmd = (lambda: self.start(url))
+        self.button = ttk.Button(text="start", command=cmd)
+        self.button.pack()
+        self.progress = ttk.Progressbar(self, orient="horizontal",
+                                        length=200, mode="determinate")
+        self.progress.pack()
+
+        self.bytes = 0
+        self.maxbytes = 0
+
+    def start(self, enter):
+        
+        url = urllib2.urlopen(enter)
+        html = url.info()
+        name = enter.split('/')[-1]
+        cl = html['Content-Length']
+        f = open(name, 'wb+')
+        fl = 0
+        self.progress.start()
+        while True:
+            xr = url.read(1024)
+            fl += len(xr)
+            self.progress.update()
+            self.progress["maximum"] = 100
+            self.progress["value"] = fl*100/int(cl)
+            f.write(xr)
+            if not xr: break
+            del xr
+        f.close()
+        self.progress.stop()
+        
 
 if __name__ == '__main__':
 
@@ -64,8 +103,12 @@ if __name__ == '__main__':
     download_path = directory + "/" + file_name_string
     
     msg = 'Download {} to {}?'.format(url, download_path)
+    print msg
     title = "Please Confirm"
     if easygui.ccbox(msg, title):     # show a Continue/Cancel dialog
-        wget_file_name = wget.download(url, out=download_path)
+    
+        app = DownloadBar(url)
+        app.mainloop()
+#        wget_file_name = wget.download(url, out=download_path)
         print "\nFile {} downloaded to {}".format(file_name, directory)
             
