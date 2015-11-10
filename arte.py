@@ -11,9 +11,11 @@ import re
 import subprocess
 import sys
 import urllib2
-import wget
 from os import environ
+from progress_meter import withprogress, UserCancelled
 
+
+    
 debug = False
 
 if __name__ == '__main__':
@@ -81,9 +83,43 @@ if __name__ == '__main__':
     
     msg = 'Download {} to {}?'.format(url, download_path)
     title = "Please Confirm"
-    if easygui.ccbox(msg, title):     # show a Continue/Cancel dialog
-        wget_file_name = wget.download(url, out=download_path)
-        msg = "\nFile {} downloaded to {}".format(file_name, directory)
-        easygui.msgbox(msg)
-        file_to_show = directory + "/" + file_name
-        subprocess.call(["open", "-R", file_to_show])
+    if easygui.ccbox(msg, title):  # Download or cancel? box
+        
+        u = urllib2.urlopen(url)
+        file_size = u.headers["Content-Length"]
+        f = open(download_path, 'wb')
+        print "Downloading: {} ({} Bytes)".format(file_name, file_size)
+
+        # Call decorator to launch the progress bar
+        @withprogress(upto=100, cancellable=True,
+                      title="Downloading...", color="orange")
+        def download():
+            """Decorated function to download file"""
+            block_sz = 64*1024  # chunk size of download
+            file_size_dl = 0
+            while True:
+                buffer = u.read(block_sz)
+                file_size_dl += len(buffer)
+                status = 100*file_size_dl/float(file_size)
+                if not buffer:
+                    break
+                f.write(buffer)
+                yield status  # Send status to progress bar decorator
+        
+        try:
+            download()
+        except UserCancelled:
+            print("Cancelled")
+        else:
+            print("Completed")        
+            msg = "File {} downloaded to {}".format(file_name, directory)
+            easygui.msgbox(msg)  # Final message box
+            file_to_show = directory + "/" + file_name
+            # Show file in download directory
+            subprocess.call(["open", "-R", file_to_show])
+        finally:
+            f.close()        
+
+        
+        
+        
