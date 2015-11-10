@@ -36,7 +36,7 @@ if __name__ == '__main__':
     try:
         # Get episode name
         episode = data['videoJsonPlayer']['VSU'].encode('utf-8').rstrip()
-        title = "{} - {}".format(broadcast, episode)
+        title = "{}-{}".format(broadcast, episode)
     except:
         title = broadcast
 
