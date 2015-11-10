@@ -1,8 +1,6 @@
 #!/bin/bash
 
-cp icon.png icon.icns
-sips -i icon.png 
-DeRez -only icns icon.png > tmpicns.rsrc
-Rez -append tmpicns.rsrc -o icon.icns
-SetFile -a C icon.icns 
-rm -f tmpicns.rsrc
+sips --resampleWidth 256 icon.png --out icon_256_tmp.png
+sips -p 256 256 icon_256_tmp.png --out icon_padded_tmp.png
+sips -s format icns icon_padded_tmp.png --out icon.icns
+rm -f *_tmp.png
