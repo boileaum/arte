@@ -9,7 +9,7 @@ from setuptools import setup
 
 APP = ['arte.py']
 DATA_FILES = []
-OPTIONS = {'iconfile': './icon/icon.icns',}
+OPTIONS = {'iconfile': './icon/icon.icns'}
 
 setup(
     app=APP,
