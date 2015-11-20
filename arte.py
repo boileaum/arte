@@ -20,9 +20,11 @@ debug = False
 
 if __name__ == '__main__':
 
-    Arte_url = easygui.enterbox('Enter an Arte+7 URL: ')
+    Arte_url = easygui.enterbox('Enter an Arte+7 URL:')
     if not Arte_url:
         sys.exit(0)
+    if debug:
+        print "Arte+7 URL:", Arte_url
     page = urllib2.urlopen(Arte_url)
     soup = BeautifulSoup(page.read(), "html.parser")
     
@@ -34,10 +36,10 @@ if __name__ == '__main__':
     f = urllib2.urlopen(jsonfile_url)
     data = json.load(f)  # Read JSON file
     # Get broadcast name
-    broadcast = data['videoJsonPlayer']['VTI'].encode('utf-8').rstrip()
+    broadcast = data['videoJsonPlayer']['VTI'].rstrip()
     try:
         # Get episode name
-        episode = data['videoJsonPlayer']['VSU'].encode('utf-8').rstrip()
+        episode = data['videoJsonPlayer']['VSU'].rstrip()
         title = "{}-{}".format(broadcast, episode)
     except:
         title = broadcast
@@ -52,8 +54,9 @@ if __name__ == '__main__':
             
     for key, val in data['videoJsonPlayer']['VSR'].items():
         if key[:5] == u'HTTP_':  # Filter HTTP URLs
-            version_string = "{} ({})".format(val['versionLibelle'],
-                                            val['quality'].replace(" ",""))
+            version_string = "{} ({})".format(
+                                val['versionLibelle'].encode('utf-8'),
+                                val['quality'].replace(" ","").encode('utf-8'))
             urls[version_string] = val['url']  # store URL
             version_choices.append(version_string)  # store version names
     
@@ -65,6 +68,7 @@ if __name__ == '__main__':
     version_choice = easygui.choicebox(msg=msg,
                                        title="Available versions",
                                        choices=version_choices)
+    version_choice = version_choice.encode('utf-8')
     if not version_choice:
         sys.exit(0)
         
@@ -81,12 +85,17 @@ if __name__ == '__main__':
     directory = environ['HOME']+"/Downloads"
     download_path = directory + "/" + file_name
     
-    msg = 'Download {} to {}?'.format(url, download_path)
-    title = "Please Confirm"
+    u = urllib2.urlopen(url)
+    file_size = float(u.headers["Content-Length"])
+    msg = 'Download:\n{}\n({:.2f} Mb) to:\n{}?'.format(url,
+                                    file_size/(1024*1024), download_path)
+    if debug:
+        print msg
+
+    title = "Please Confirm"    
     if easygui.ccbox(msg, title):  # Download or cancel? box
         
-        u = urllib2.urlopen(url)
-        file_size = u.headers["Content-Length"]
+
         f = open(download_path, 'wb')
         print "Downloading: {} ({} Bytes)".format(file_name, file_size)
 
@@ -100,7 +109,7 @@ if __name__ == '__main__':
             while True:
                 buffer = u.read(block_sz)
                 file_size_dl += len(buffer)
-                status = 100*file_size_dl/float(file_size)
+                status = 100*file_size_dl/file_size
                 if not buffer:
                     break
                 f.write(buffer)
@@ -118,8 +127,5 @@ if __name__ == '__main__':
             # Show file in download directory
             subprocess.call(["open", "-R", file_to_show])
         finally:
-            f.close()        
-
-        
-        
+            f.close()
         
