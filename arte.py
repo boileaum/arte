@@ -95,7 +95,8 @@ if easygui.ccbox(msg, title):  # Download or cancel? box
     
 
     f = open(download_path, 'wb')
-    print u"Downloading: {} ({} Bytes)".format(file_name, file_size)
+    print "Downloading: {} ({} Bytes)".format(file_name.encode('utf-8'),
+                                        file_size)
 
     # Call decorator to launch the progress bar
     @withprogress(upto=100, cancellable=True,
@@ -119,7 +120,8 @@ if easygui.ccbox(msg, title):  # Download or cancel? box
         print("Cancelled")
     else:
         print("Completed")        
-        msg = u"File {} downloaded to {}".format(file_name, directory)
+        msg = "File {} downloaded to {}".format(file_name.encode('utf-8'),
+                                         directory)
         easygui.msgbox(msg)  # Final message box
         file_to_show = directory + "/" + file_name
         # Show file in download directory
