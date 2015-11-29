@@ -1,10 +1,13 @@
 #/bin/bash
 
-./clean.sh
-if [ "$1" = "--alias" ]
+if [ $# != 0 ]
 then
-  ./build_alias.sh
-else
-  ./build_standalone.sh
+  if [ $1 != "--alias" ]
+  then
+    echo "Usage: install.sh [--alias]"
+    exit
+  fi
 fi
+./clean.sh
+./build.sh $1
 ./finalize.sh
