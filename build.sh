@@ -1,6 +1,13 @@
 #!/bin/bash
 
-BASEPATH="$HOME/anaconda2/lib"
+if [ $HOME/anaconda ]
+then
+  BASEPATH="$HOME/anaconda/lib"
+else
+  BASEPATH="$HOME/anaconda2/lib"
+fi
+echo $BASEPATH
+
 BASECMD="python setup.py py2app --resources $BASEPATH/tcl8.5,$BASEPATH/tk8.5"
 
 if [ $# == 0 ]
