@@ -15,8 +15,7 @@ from os import environ
 from progress_meter import withprogress, UserCancelled
 
 
-    
-debug = False
+debug = True
 
 Arte_url = easygui.enterbox('Enter an Arte+7 URL:')
 if not Arte_url:
@@ -30,7 +29,6 @@ soup = BeautifulSoup(page.read(), "html.parser")
 video = soup.find('div', class_='video-container')
 jsonfile_url = video['arte_vp_url']
 
-urls = {}  # Dict to store available URLs
 f = urllib2.urlopen(jsonfile_url)
 data = json.load(f)  # Read JSON file
 # Get broadcast name
@@ -42,42 +40,44 @@ try:
 except:
     title = broadcast
 
-iversion = 1
-version_choices = []
-
 avail_versions = {}
-for key, val in data['videoJsonPlayer']['VSR'].items():
+for key, val in data['videoJsonPlayer']['VSR'].iteritems():
     if key[:5] == u'HTTP_':  # Filter HTTP URLs
         avail_versions[val['quality']] = val['versionLibelle']
-        
+
+urls = {}  # Dict to store available URLs
 for key, val in data['videoJsonPlayer']['VSR'].items():
     if key[:5] == u'HTTP_':  # Filter HTTP URLs
         version_string = u"{} ({})".format(
                             val['versionLibelle'],
-                            val['quality'].replace(" ",""))
+                            val['quality'].replace(" ", ""))
         urls[version_string] = val['url']  # store URL
-        # store version names
-        version_choices.append(version_string.encode('utf-8'))
 
+# store version names in utf-8
+version_choices = [k.encode('utf-8') for k in urls.iterkeys()]
 msg = u"Available versions of \"{}\" for download" \
         .format(title)
 if debug:
-    print msg
+    print msg.encode('utf-8')
     print version_choices
+
+# Get version choice from dialog box
 version_choice = easygui.choicebox(msg=msg,
                                    title=u"Available versions",
                                    choices=version_choices)
 if not version_choice:
-    sys.exit(0)
-    
-url = urls[version_choice]
+    sys.exit(0)  # Exit if user did cancel
+else:
+    url = urls[version_choice]
 
 file_extension = url.split('.')[-1]
 tmp_name = u"Arte-{}-{}.{}".format(title,
-                                version_choice.replace(" ","-"),
-                                file_extension)
-# Remove ":" and replace spaces (and duplicate spaces) by underscores
-file_name = tmp_name.replace(":","").replace(' +','_').replace('/','sur')
+                                   version_choice.replace(" ", "-"),
+                                   file_extension)
+# Remove ":"
+# Replace blank spaces (and duplicate spaces) by underscores
+# Replace "/" by "sur"
+file_name = re.sub('\s+', '_', tmp_name.replace(":", "").replace('/', 'sur'))
 
 # Destination directory is default user download directory
 directory = environ['HOME'].decode('utf-8') + u"/Downloads"
@@ -86,17 +86,17 @@ download_path = directory + u"/" + file_name
 u = urllib2.urlopen(url)
 file_size = float(u.headers["Content-Length"])
 msg = u'Download:\n{}\n({:.2f} Mb) to:\n{}?'.format(url,
-                                file_size/(1024*1024), download_path)
+                                                    file_size/(1024*1024),
+                                                    download_path)
 if debug:
-    print msg
+    print msg.encode('utf-8')
 
-title = "Please Confirm"    
+title = "Please Confirm"
 if easygui.ccbox(msg, title):  # Download or cancel? box
-    
 
     f = open(download_path, 'wb')
     print "Downloading: {} ({} Bytes)".format(file_name.encode('utf-8'),
-                                        file_size)
+                                              file_size)
 
     # Call decorator to launch the progress bar
     @withprogress(upto=100, cancellable=True,
@@ -113,19 +113,18 @@ if easygui.ccbox(msg, title):  # Download or cancel? box
                 break
             f.write(buffer)
             yield status  # Send status to progress bar decorator
-    
+
     try:
         download()
     except UserCancelled:
         print("Cancelled")
     else:
-        print("Completed")        
+        print("Completed")
         msg = "File {} downloaded to {}".format(file_name.encode('utf-8'),
-                                         directory)
+                                                directory.encode('utf-8'))
         easygui.msgbox(msg)  # Final message box
         file_to_show = directory + "/" + file_name
         # Show file in download directory
         subprocess.call(["open", "-R", file_to_show])
     finally:
         f.close()
-        
