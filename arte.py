@@ -15,7 +15,7 @@ from os import environ
 from progress_meter import withprogress, UserCancelled
 
 
-debug = True
+debug = False
 
 Arte_url = easygui.enterbox('Enter an Arte+7 URL:')
 if not Arte_url:
